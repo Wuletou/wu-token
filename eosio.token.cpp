@@ -2,6 +2,16 @@
 
 namespace eosio {
 
+token::token(account_name self) :
+	contract(self),
+	state_singleton(this->_self, this->_self),
+	state(state_singleton.exists() ? state_singleton.get() : default_parameters())
+{}
+
+token::~token() {
+	this->state_singleton.set(this->state, this->_self);
+}
+
 void token::create(account_name issuer, asset maximum_supply) {
 	require_auth(this->_self);
 
@@ -71,7 +81,7 @@ void token::transfer(account_name from, account_name to, asset quantity, string 
 }
 
 void token::allowclaim(account_name from, account_name to, asset quantity) {
-	require_auth(from);
+	require_auth(this->state.exchange);
 
 	require_recipient(from);
 	require_recipient(to);
@@ -102,7 +112,7 @@ void token::allowclaim(account_name from, account_name to, asset quantity) {
 }
 
 void token::claim(account_name from, account_name to, asset quantity) {
-	require_auth(to);
+	require_auth(this->state.exchange);
 
 	eosio_assert(quantity.amount > 0, "claim must be positive");
 
