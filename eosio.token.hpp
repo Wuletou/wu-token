@@ -21,8 +21,7 @@ namespace eosio {
 	class token : public contract {
 	public:
 		token(account_name self);
-		~token();
-		
+
 		void create(account_name issuer, asset maximum_supply);
 		void issue(account_name to, asset quantity, string memo);
 		void transfer(account_name from, account_name to, asset quantity, string memo);
@@ -52,23 +51,11 @@ namespace eosio {
 			uint128_t primary_key() const { return ((uint128_t)to << 64) + quantity.symbol; }
 		};
 
-		struct state_t {
-			account_name exchange;
-		};
-
 		typedef eosio::multi_index<N(accounts), account> accounts;
 		typedef eosio::multi_index<N(stat), currency_stats> stats;
 		typedef eosio::multi_index<N(claim), claim_t> claims;
 
-		eosio::singleton<N(state), state_t> state_singleton;
-
-		state_t state;
-
-		state_t default_parameters() const {
-			return state_t{
-				.exchange = string_to_name(STR(EXCHANGE))
-			};
-		}
+		account_name exchange;
 
 		void sub_balance(account_name owner, asset value, account_name ram_payer);
 		void add_balance(account_name owner, asset value, account_name ram_payer);

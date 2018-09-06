@@ -4,13 +4,8 @@ namespace eosio {
 
 token::token(account_name self) :
 	contract(self),
-	state_singleton(this->_self, this->_self),
-	state(state_singleton.exists() ? state_singleton.get() : default_parameters())
+	exchange(string_to_name(STR(EXCHANGE)))
 {}
-
-token::~token() {
-	this->state_singleton.set(this->state, this->_self);
-}
 
 void token::create(account_name issuer, asset maximum_supply) {
 	require_auth(this->_self);
@@ -81,9 +76,9 @@ void token::transfer(account_name from, account_name to, asset quantity, string 
 }
 
 void token::allowclaim(account_name from, asset quantity) {
-	require_auth(this->state.exchange);
+	require_auth(this->exchange);
 
-	account_name to = this->state.exchange;
+	account_name to = this->exchange;
 
 	require_recipient(from);
 	require_recipient(to);
@@ -91,14 +86,14 @@ void token::allowclaim(account_name from, asset quantity) {
 	accounts from_acnts(this->_self, from);
 	const auto& account = from_acnts.find(quantity.symbol.name());
 	eosio_assert(account != from_acnts.end(), "symbol not found");
-	from_acnts.modify(account, this->state.exchange, [quantity](auto& a) {
+	from_acnts.modify(account, this->exchange, [quantity](auto& a) {
 		a.blocked += quantity.amount;
 	});
 
 	claims from_claims(this->_self, from);
 	const auto& claim = from_claims.find(((uint128_t)to << 64) + quantity.symbol);
 	if (claim == from_claims.end()) {
-		from_claims.emplace(this->state.exchange, [to, quantity](auto& c) {
+		from_claims.emplace(this->exchange, [to, quantity](auto& c) {
 			c.to = to;
 			c.quantity = quantity;
 		});
@@ -106,7 +101,7 @@ void token::allowclaim(account_name from, asset quantity) {
 		if (claim->quantity.amount == -quantity.amount) {
 			from_claims.erase(claim);
 		} else {
-			from_claims.modify(claim, this->state.exchange, [quantity](auto& c) {
+			from_claims.modify(claim, this->exchange, [quantity](auto& c) {
 				c.quantity += quantity;
 			});
 		}
@@ -114,14 +109,14 @@ void token::allowclaim(account_name from, asset quantity) {
 }
 
 void token::claim(account_name from, account_name to, asset quantity) {
-	require_auth(this->state.exchange);
+	require_auth(this->exchange);
 
 	eosio_assert(quantity.amount > 0, "claim must be positive");
 
 	accounts from_acnts(this->_self, from);
 	const auto& account = from_acnts.find(quantity.symbol.name());
 	eosio_assert(account != from_acnts.end(), "symbol not found");
-	from_acnts.modify(account, this->state.exchange, [quantity](auto& a) {
+	from_acnts.modify(account, this->exchange, [quantity](auto& a) {
 		a.blocked -= quantity.amount;
 	});
 
@@ -131,13 +126,13 @@ void token::claim(account_name from, account_name to, asset quantity) {
 	if (claim->quantity.amount == quantity.amount) {
 		from_claims.erase(claim);
 	} else {
-		from_claims.modify(claim, this->state.exchange, [quantity](auto& c) {
+		from_claims.modify(claim, this->exchange, [quantity](auto& c) {
 			c.quantity -= quantity;
 		});
 	}
 
-	sub_balance(from, quantity, this->state.exchange);
-	add_balance(to, quantity, this->state.exchange);
+	sub_balance(from, quantity, this->exchange);
+	add_balance(to, quantity, this->exchange);
 }
 
 void token::sub_balance(account_name owner, asset value, account_name ram_payer) {
