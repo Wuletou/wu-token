@@ -70,7 +70,8 @@
       "name": "account",
       "base": "",
       "fields": [
-        {"name":"balance", "type":"asset"}
+        {"name":"balance", "type":"asset"},
+        {"name":"blocked", "type":"i64"}
       ]
     },{
       "name": "currency_stats",
