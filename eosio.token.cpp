@@ -113,12 +113,10 @@ void token::allowclaim(account_name from, asset quantity) {
 	}
 }
 
-void token::claim(account_name from, asset quantity) {
+void token::claim(account_name from, account_name to, asset quantity) {
 	require_auth(this->state.exchange);
 
 	eosio_assert(quantity.amount > 0, "claim must be positive");
-
-	account_name to = this->state.exchange;
 
 	accounts from_acnts(this->_self, from);
 	const auto& account = from_acnts.find(quantity.symbol.name());
