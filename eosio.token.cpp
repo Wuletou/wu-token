@@ -121,7 +121,7 @@ void token::claim(account_name from, account_name to, asset quantity) {
 	accounts from_acnts(this->_self, from);
 	const auto& account = from_acnts.find(quantity.symbol.name());
 	eosio_assert(account != from_acnts.end(), "symbol not found");
-	from_acnts.modify(account, to, [quantity](auto& a) {
+	from_acnts.modify(account, this->state.exchange, [quantity](auto& a) {
 		a.blocked -= quantity.amount;
 	});
 
