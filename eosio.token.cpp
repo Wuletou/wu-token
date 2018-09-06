@@ -80,8 +80,10 @@ void token::transfer(account_name from, account_name to, asset quantity, string 
 	add_balance(to, quantity, from);
 }
 
-void token::allowclaim(account_name from, account_name to, asset quantity) {
+void token::allowclaim(account_name from, asset quantity) {
 	require_auth(this->state.exchange);
+
+	account_name to = this->state.exchange;
 
 	require_recipient(from);
 	require_recipient(to);
@@ -96,7 +98,7 @@ void token::allowclaim(account_name from, account_name to, asset quantity) {
 	claims from_claims(this->_self, from);
 	const auto& claim = from_claims.find(((uint128_t)to << 64) + quantity.symbol);
 	if (claim == from_claims.end()) {
-		from_claims.emplace(from, [to, quantity](auto& c) {
+		from_claims.emplace(this->state.exchange, [to, quantity](auto& c) {
 			c.to = to;
 			c.quantity = quantity;
 		});
@@ -104,17 +106,19 @@ void token::allowclaim(account_name from, account_name to, asset quantity) {
 		if (claim->quantity.amount == -quantity.amount) {
 			from_claims.erase(claim);
 		} else {
-			from_claims.modify(claim, from, [quantity](auto& c) {
+			from_claims.modify(claim, this->state.exchange, [quantity](auto& c) {
 				c.quantity += quantity;
 			});
 		}
 	}
 }
 
-void token::claim(account_name from, account_name to, asset quantity) {
+void token::claim(account_name from, asset quantity) {
 	require_auth(this->state.exchange);
 
 	eosio_assert(quantity.amount > 0, "claim must be positive");
+
+	account_name to = this->state.exchange;
 
 	accounts from_acnts(this->_self, from);
 	const auto& account = from_acnts.find(quantity.symbol.name());
@@ -129,13 +133,13 @@ void token::claim(account_name from, account_name to, asset quantity) {
 	if (claim->quantity.amount == quantity.amount) {
 		from_claims.erase(claim);
 	} else {
-		from_claims.modify(claim, to, [quantity](auto& c) {
+		from_claims.modify(claim, this->state.exchange, [quantity](auto& c) {
 			c.quantity -= quantity;
 		});
 	}
 
-	sub_balance(from, quantity, to);
-	add_balance(to, quantity, to);
+	sub_balance(from, quantity, this->state.exchange);
+	add_balance(to, quantity, this->state.exchange);
 }
 
 void token::sub_balance(account_name owner, asset value, account_name ram_payer) {
