@@ -4,8 +4,14 @@ namespace eosio {
 
 token::token(account_name self) :
 	contract(self),
-	exchange(string_to_name(STR(EXCHANGE)))
+	exchange(string_to_name(STR(EXCHANGE))),
+	state_singleton(this->_self, this->_self),
+	state(state_singleton.exists() ? state_singleton.get() : default_parameters())
 {}
+
+token::~token() {
+	this->state_singleton.set(this->state, this->_self);
+}
 
 void token::create(account_name issuer, asset maximum_supply) {
 	require_auth(this->_self);
@@ -135,6 +141,12 @@ void token::claim(account_name from, account_name to, asset quantity) {
 	add_balance(to, quantity, this->exchange);
 }
 
+void token::setver(eosio::string ver, eosio::string hash) {
+	require_auth(this->_self);
+	this->state.version.ver = ver;
+	this->state.version.hash = hash;
+}
+
 void token::sub_balance(account_name owner, asset value, account_name ram_payer) {
 	accounts from_acnts(this->_self, owner);
 
@@ -167,4 +179,4 @@ void token::add_balance(account_name owner, asset value, account_name ram_payer)
 
 } /// namespace eosio
 
-EOSIO_ABI(eosio::token, (create)(issue)(transfer)(allowclaim)(claim))
+EOSIO_ABI(eosio::token, (create)(issue)(transfer)(allowclaim)(claim)(setver))
