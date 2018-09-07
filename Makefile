@@ -1,5 +1,5 @@
 NAME=wu-token
-ACCOUNT=$(word 3, $(shell cat config.h | grep EXCHANGE))
+ACCOUNT=mywishte1111
 VERSION=$(shell git tag --points-at HEAD)
 VERSIONHASH=$(shell git rev-parse HEAD)
 

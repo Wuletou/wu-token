@@ -6,11 +6,6 @@
 
 #include <string>
 
-#include "config.h"
-
-#define STR_EXPAND(C) #C
-#define STR(C) STR_EXPAND(C)
-
 class wutoken : public eosio::contract {
 public:
 	wutoken(account_name self);
@@ -19,7 +14,7 @@ public:
 	void create(account_name issuer, eosio::asset maximum_supply);
 	void issue(account_name to, eosio::asset quantity, std::string memo);
 	void transfer(account_name from, account_name to, eosio::asset quantity, std::string memo);
-	void allowclaim(account_name from, eosio::asset quantity);
+	void allowclaim(account_name from, account_name to, eosio::asset quantity);
 	void claim(account_name from, account_name to, eosio::asset quantity);
 	void setver(std::string ver, std::string hash);
 
@@ -58,8 +53,6 @@ private:
 	typedef eosio::multi_index<N(accounts), account> accounts;
 	typedef eosio::multi_index<N(stat), currency_stats> stats;
 	typedef eosio::multi_index<N(claim), claim_t> claims;
-
-	account_name exchange;
 
 	eosio::singleton<N(state), state_t> state_singleton;
 
