@@ -1,4 +1,4 @@
-NAME=eosio.token
+NAME=wu-token
 ACCOUNT=$(word 3, $(shell cat config.h | grep EXCHANGE))
 VERSION=$(shell git tag --points-at HEAD)
 VERSIONHASH=$(shell git rev-parse HEAD)

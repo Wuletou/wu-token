@@ -1,19 +1,17 @@
-#include "eosio.token.hpp"
+#include "wu-token.hpp"
 
-namespace eosio {
-
-token::token(account_name self) :
-	contract(self),
-	exchange(string_to_name(STR(EXCHANGE))),
+wutoken::wutoken(account_name self) :
+	eosio::contract(self),
+	exchange(eosio::string_to_name(STR(EXCHANGE))),
 	state_singleton(this->_self, this->_self),
 	state(state_singleton.exists() ? state_singleton.get() : default_parameters())
 {}
 
-token::~token() {
+wutoken::~wutoken() {
 	this->state_singleton.set(this->state, this->_self);
 }
 
-void token::create(account_name issuer, asset maximum_supply) {
+void wutoken::create(account_name issuer, eosio::asset maximum_supply) {
 	require_auth(this->_self);
 
 	auto sym = maximum_supply.symbol;
@@ -32,7 +30,7 @@ void token::create(account_name issuer, asset maximum_supply) {
 	});
 }
 
-void token::issue(account_name to, asset quantity, string memo) {
+void wutoken::issue(account_name to, eosio::asset quantity, std::string memo) {
 	auto sym = quantity.symbol;
 	eosio_assert(sym.is_valid(), "invalid symbol name");
 	eosio_assert(memo.size() <= 256, "memo has more than 256 bytes");
@@ -61,7 +59,7 @@ void token::issue(account_name to, asset quantity, string memo) {
 	}
 }
 
-void token::transfer(account_name from, account_name to, asset quantity, string memo) {
+void wutoken::transfer(account_name from, account_name to, eosio::asset quantity, std::string memo) {
 	eosio_assert(from != to, "cannot transfer to self");
 	require_auth(from);
 	eosio_assert(is_account(to), "to account does not exist");
@@ -81,7 +79,7 @@ void token::transfer(account_name from, account_name to, asset quantity, string 
 	add_balance(to, quantity, from);
 }
 
-void token::allowclaim(account_name from, asset quantity) {
+void wutoken::allowclaim(account_name from, eosio::asset quantity) {
 	require_auth(this->exchange);
 
 	account_name to = this->exchange;
@@ -114,7 +112,7 @@ void token::allowclaim(account_name from, asset quantity) {
 	}
 }
 
-void token::claim(account_name from, account_name to, asset quantity) {
+void wutoken::claim(account_name from, account_name to, eosio::asset quantity) {
 	require_auth(this->exchange);
 
 	eosio_assert(quantity.amount > 0, "claim must be positive");
@@ -141,13 +139,13 @@ void token::claim(account_name from, account_name to, asset quantity) {
 	add_balance(to, quantity, this->exchange);
 }
 
-void token::setver(eosio::string ver, eosio::string hash) {
+void wutoken::setver(std::string ver, std::string hash) {
 	require_auth(this->_self);
 	this->state.version.ver = ver;
 	this->state.version.hash = hash;
 }
 
-void token::sub_balance(account_name owner, asset value, account_name ram_payer) {
+void wutoken::sub_balance(account_name owner, eosio::asset value, account_name ram_payer) {
 	accounts from_acnts(this->_self, owner);
 
 	const auto& from = from_acnts.get(value.symbol.name(), "no balance object found");
@@ -162,7 +160,7 @@ void token::sub_balance(account_name owner, asset value, account_name ram_payer)
 	}
 }
 
-void token::add_balance(account_name owner, asset value, account_name ram_payer) {
+void wutoken::add_balance(account_name owner, eosio::asset value, account_name ram_payer) {
 	accounts to_acnts(this->_self, owner);
 	auto to = to_acnts.find(value.symbol.name());
 	if (to == to_acnts.end()) {
@@ -177,6 +175,4 @@ void token::add_balance(account_name owner, asset value, account_name ram_payer)
 	}
 }
 
-} /// namespace eosio
-
-EOSIO_ABI(eosio::token, (create)(issue)(transfer)(allowclaim)(claim)(setver))
+EOSIO_ABI(wutoken, (create)(issue)(transfer)(allowclaim)(claim)(setver))
