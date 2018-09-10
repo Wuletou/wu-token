@@ -1,7 +1,10 @@
 #include "wu-token.hpp"
+#include "config.h"
+#include "str_expand.h"
 
 wutoken::wutoken(account_name self) :
 	eosio::contract(self),
+	exchange(eosio::string_to_name(STR(EXCHANGE))),
 	state_singleton(this->_self, this->_self),
 	state(state_singleton.exists() ? state_singleton.get() : default_parameters())
 {}
@@ -80,6 +83,7 @@ void wutoken::transfer(account_name from, account_name to, eosio::asset quantity
 
 void wutoken::allowclaim(account_name from, account_name to, eosio::asset quantity) {
 	require_auth(from);
+	require_auth(this->exchange);
 
 	require_recipient(from);
 	require_recipient(to);
@@ -111,6 +115,7 @@ void wutoken::allowclaim(account_name from, account_name to, eosio::asset quanti
 
 void wutoken::claim(account_name from, account_name to, eosio::asset quantity) {
 	require_auth(to);
+	require_auth(this->exchange);
 
 	eosio_assert(quantity.amount > 0, "claim must be positive");
 
