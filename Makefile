@@ -1,6 +1,6 @@
 NAME=wu-token
 ACCOUNT=mywishte1111
-VERSION=$(shell git tag --points-at HEAD)
+VERSION=$(shell git describe --tags --abbrev=0)
 VERSIONHASH=$(shell git rev-parse HEAD)
 
 all: compile publish
