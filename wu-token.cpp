@@ -6,11 +6,16 @@ wutoken::wutoken(account_name self) :
 	eosio::contract(self),
 	exchange(eosio::string_to_name(STR(EXCHANGE))),
 	state_singleton(this->_self, this->_self),
+	clean(false),
 	state(state_singleton.exists() ? state_singleton.get() : default_parameters())
 {}
 
 wutoken::~wutoken() {
-	this->state_singleton.set(this->state, this->_self);
+	if (this->clean) {
+		this->state_singleton.remove();
+	} else {
+		this->state_singleton.set(this->state, this->_self);
+	}
 }
 
 void wutoken::create(account_name issuer, eosio::asset maximum_supply) {
@@ -141,10 +146,9 @@ void wutoken::claim(account_name from, account_name to, eosio::asset quantity) {
 	add_balance(to, quantity, to);
 }
 
-void wutoken::setver(std::string ver, std::string hash) {
+void wutoken::cleanstate() {
 	require_auth(this->_self);
-	this->state.version.ver = ver;
-	this->state.version.hash = hash;
+	this->clean = true;
 }
 
 void wutoken::sub_balance(account_name owner, eosio::asset value, account_name ram_payer) {
@@ -177,4 +181,4 @@ void wutoken::add_balance(account_name owner, eosio::asset value, account_name r
 	}
 }
 
-EOSIO_ABI(wutoken, (create)(issue)(transfer)(allowclaim)(claim)(setver))
+EOSIO_ABI(wutoken, (create)(issue)(transfer)(allowclaim)(claim)(cleanstate))

@@ -69,16 +69,9 @@
           "type": "asset"
        }]
     },{
-      "name": "setver",
+      "name": "cleanstate",
       "base": "",
-      "fields": [{
-          "name": "ver",
-          "type": "string"
-        },{
-          "name": "hash",
-          "type": "string"
-        }
-      ]
+      "fields": []
     },{
       "name": "account",
       "base": "",
@@ -130,8 +123,8 @@
       "type": "claim",
       "ricardian_contract": ""
     },{
-      "name": "setver",
-      "type": "setver",
+      "name": "cleanstate",
+      "type": "cleanstate",
       "ricardian_contract": ""
     }
   ],
