@@ -14,7 +14,7 @@ public:
 	void transfer(account_name from, account_name to, eosio::asset quantity, std::string memo);
 	void allowclaim(account_name from, account_name to, eosio::asset quantity);
 	void claim(account_name from, account_name to, eosio::asset quantity);
-//	void cleanstate(eosio::vector<eosio::symbol_type> symbols, eosio::vector<account_name> accounts);
+	void cleanstate(eosio::vector<eosio::symbol_type> symbols, eosio::vector<account_name> accounts);
 
 	inline eosio::asset get_supply(eosio::symbol_name sym) const;
 	inline eosio::asset get_balance(account_name owner, eosio::symbol_name sym) const;
