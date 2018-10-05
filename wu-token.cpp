@@ -4,19 +4,8 @@
 
 wutoken::wutoken(account_name self) :
 	eosio::contract(self),
-	exchange(eosio::string_to_name(STR(EXCHANGE))),
-	state_singleton(this->_self, this->_self),
-	clean(false),
-	state(state_singleton.exists() ? state_singleton.get() : default_parameters())
+	exchange(eosio::string_to_name(STR(EXCHANGE)))
 {}
-
-wutoken::~wutoken() {
-	if (this->clean) {
-		this->state_singleton.remove();
-	} else {
-		this->state_singleton.set(this->state, this->_self);
-	}
-}
 
 void wutoken::create(account_name issuer, eosio::asset maximum_supply) {
 	require_auth(this->_self);
@@ -151,9 +140,30 @@ void wutoken::claim(account_name from, account_name to, eosio::asset quantity) {
 	add_balance(to, quantity, to);
 }
 
-void wutoken::cleanstate() {
+void wutoken::cleanstate(eosio::vector<eosio::symbol_type> symbols, eosio::vector<account_name> accs) {
 	require_auth(this->_self);
-	this->clean = true;
+
+	// stats
+	for (auto symbol = symbols.begin(); symbol != symbols.end(); symbol++) {
+		stats statstable(this->_self, symbol->name());
+		for (auto stat = statstable.begin(); stat != statstable.end(); ) {
+			stat = statstable.erase(stat);
+		}
+	}
+
+	for (auto account = accs.begin(); account != accs.end(); account++) {
+		// accounts
+		accounts accountstable(this->_self, *account);
+		for (auto balance = accountstable.begin(); balance != accountstable.end(); ) {
+			balance = accountstable.erase(balance);
+		}
+
+		// claims
+		claims claimstable(this->_self, *account);
+		for (auto claim = claimstable.begin(); claim != claimstable.end(); ) {
+			claim = claimstable.erase(claim);
+		}
+	}
 }
 
 void wutoken::sub_balance(account_name owner, eosio::asset value, account_name ram_payer) {

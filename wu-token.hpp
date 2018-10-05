@@ -16,7 +16,7 @@ public:
 	void transfer(account_name from, account_name to, eosio::asset quantity, std::string memo);
 	void allowclaim(account_name from, account_name to, eosio::asset quantity);
 	void claim(account_name from, account_name to, eosio::asset quantity);
-	void cleanstate();
+	void cleanstate(eosio::vector<eosio::symbol_type> symbols, eosio::vector<account_name> accounts);
 
 	inline eosio::asset get_supply(eosio::symbol_name sym) const;
 	inline eosio::asset get_balance(account_name owner, eosio::symbol_name sym) const;
@@ -43,34 +43,11 @@ private:
 		uint128_t get_to_quantity() const { return ((uint128_t)to << 64) + quantity.symbol; }
 	};
 
-	struct version_t {
-		std::string ver;
-		std::string hash;
-	};
-
-	struct state_t {
-		version_t version;
-	};
-
 	typedef eosio::multi_index<N(accounts), account> accounts;
 	typedef eosio::multi_index<N(stat), currency_stats> stats;
 	typedef eosio::multi_index<N(claim), claim_t, eosio::indexed_by<N(toquantity), eosio::const_mem_fun<claim_t, uint128_t, &claim_t::get_to_quantity>>> claims;
 
 	account_name exchange;
-
-	eosio::singleton<N(state), state_t> state_singleton;
-
-	bool clean;
-	state_t state;
-
-	state_t default_parameters() {
-		return state_t{
-			.version = version_t{
-				.ver = "",
-				.hash = ""
-			}
-		};
-	}
 
 	void sub_balance(account_name owner, eosio::asset value, account_name ram_payer);
 	void add_balance(account_name owner, eosio::asset value, account_name ram_payer);
