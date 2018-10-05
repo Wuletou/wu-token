@@ -72,7 +72,7 @@
       "name": "cleanstate",
       "base": "",
       "fields": [
-        {"name":"symbols", "type":"symbol[]"},
+        {"name":"symbs", "type":"symbol[]"},
         {"name":"accs", "type":"name[]"}
      ]
     },{

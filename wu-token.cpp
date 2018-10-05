@@ -140,11 +140,11 @@ void wutoken::claim(account_name from, account_name to, eosio::asset quantity) {
 	add_balance(to, quantity, to);
 }
 
-void wutoken::cleanstate(eosio::vector<eosio::symbol_type> symbols, eosio::vector<account_name> accs) {
+void wutoken::cleanstate(eosio::vector<eosio::symbol_type> symbs, eosio::vector<account_name> accs) {
 	require_auth(this->_self);
 
 	// stats
-	for (auto symbol = symbols.begin(); symbol != symbols.end(); symbol++) {
+	for (auto symbol = symbs.begin(); symbol != symbs.end(); symbol++) {
 		stats statstable(this->_self, symbol->name());
 		for (auto stat = statstable.begin(); stat != statstable.end(); ) {
 			stat = statstable.erase(stat);
