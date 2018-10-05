@@ -69,13 +69,6 @@
           "type": "asset"
        }]
     },{
-      "name": "cleanstate",
-      "base": "",
-      "fields": [
-        {"name":"symbols", "type":"symbol[]"},
-        {"name":"accs", "type":"name[]"}
-      ]
-    },{
       "name": "account",
       "base": "",
       "fields": [
@@ -111,10 +104,6 @@
     },{
       "name": "claim",
       "type": "claim",
-      "ricardian_contract": ""
-    },{
-      "name": "cleanstate",
-      "type": "cleanstate",
       "ricardian_contract": ""
     }
   ],

@@ -2,21 +2,19 @@
 
 #include <eosiolib/asset.hpp>
 #include <eosiolib/eosio.hpp>
-#include <eosiolib/singleton.hpp>
 
 #include <string>
 
 class wutoken : public eosio::contract {
 public:
 	wutoken(account_name self);
-	~wutoken();
 
 	void create(account_name issuer, eosio::asset maximum_supply);
 	void issue(account_name to, eosio::asset quantity, std::string memo);
 	void transfer(account_name from, account_name to, eosio::asset quantity, std::string memo);
 	void allowclaim(account_name from, account_name to, eosio::asset quantity);
 	void claim(account_name from, account_name to, eosio::asset quantity);
-	void cleanstate(eosio::vector<eosio::symbol_type> symbols, eosio::vector<account_name> accounts);
+//	void cleanstate(eosio::vector<eosio::symbol_type> symbols, eosio::vector<account_name> accounts);
 
 	inline eosio::asset get_supply(eosio::symbol_name sym) const;
 	inline eosio::asset get_balance(account_name owner, eosio::symbol_name sym) const;
