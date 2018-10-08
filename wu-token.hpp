@@ -33,15 +33,6 @@ private:
 		uint64_t primary_key() const { return supply.symbol.name(); }
 	};
 
-	struct version_t {
-		std::string ver;
-		std::string hash;
-	};
-
-	struct state_t {
-		version_t version;
-	};
-
 	typedef eosio::multi_index<N(accounts), account> accounts;
 	typedef eosio::multi_index<N(stat), currency_stats> stats;
 
