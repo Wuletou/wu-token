@@ -48,11 +48,7 @@ void wutoken::issue(account_name to, eosio::asset quantity, std::string memo) {
 		s.supply += quantity;
 	});
 
-	add_balance(st.issuer, quantity, st.issuer);
-
-	if (to != st.issuer) {
-		SEND_INLINE_ACTION(*this, transfer, {st.issuer,N(active)}, {st.issuer, to, quantity, memo});
-	}
+	add_balance(to, quantity, st.issuer);
 }
 
 void wutoken::transfer(account_name from, account_name to, eosio::asset quantity, std::string memo) {
