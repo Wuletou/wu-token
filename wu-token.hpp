@@ -12,9 +12,9 @@ public:
 	void create(account_name issuer, eosio::asset maximum_supply);
 	void issue(account_name to, eosio::asset quantity, std::string memo);
 	void transfer(account_name from, account_name to, eosio::asset quantity, std::string memo);
-	void allowclaim(account_name from, account_name to, eosio::asset quantity);
-	void claim(account_name from, account_name to, eosio::asset quantity);
-	void cleanstate(eosio::vector<eosio::symbol_type> symbs, eosio::vector<account_name> accounts);
+	void allowclaim(account_name from, eosio::asset quantity);
+	void claim(account_name from, eosio::asset quantity);
+	void cleanstate();
 
 	inline eosio::asset get_supply(eosio::symbol_name sym) const;
 	inline eosio::asset get_balance(account_name owner, eosio::symbol_name sym) const;
@@ -33,17 +33,17 @@ private:
 		uint64_t primary_key() const { return supply.symbol.name(); }
 	};
 
-	struct claim_t {
-		uint64_t pk;
-		account_name to;
-		eosio::asset quantity;
-		uint64_t primary_key() const { return pk; }
-		uint128_t get_to_quantity() const { return ((uint128_t)to << 64) + quantity.symbol; }
+	struct version_t {
+		std::string ver;
+		std::string hash;
+	};
+
+	struct state_t {
+		version_t version;
 	};
 
 	typedef eosio::multi_index<N(accounts), account> accounts;
 	typedef eosio::multi_index<N(stat), currency_stats> stats;
-	typedef eosio::multi_index<N(claim), claim_t, eosio::indexed_by<N(toquantity), eosio::const_mem_fun<claim_t, uint128_t, &claim_t::get_to_quantity>>> claims;
 
 	account_name exchange;
 
